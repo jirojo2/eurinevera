@@ -1,0 +1,175 @@
+body {
+	margin: 0;
+	padding: 0;
+	font-family: monospace, helvetica, verdana;
+}
+
+#wrapper {
+	position: relative;
+	width: 480px;
+	height: 750px;
+}
+
+#logo {
+	background: url("../eurielec.png") no-repeat;
+	background-color: #eee;
+	background-position: center;
+	height: 80px;
+	margin-right: auto;
+	margin-left:  auto;	
+	margin-bottom: 15px;
+	cursor: pointer;
+}
+
+.btn {
+	display: inline-block;
+	width: 230px;
+	height: 288px;
+	line-height: 288px;
+	margin-bottom: 15px;	
+	background-color: #eee;
+	cursor: pointer;
+	text-align: center;
+	font-size: 32pt;
+	font-variant: small-caps;
+}
+
+.btn:hover {
+	background-color: #ccc;
+}
+
+#btnBuy {
+	margin-right: 5px;
+}
+
+#btnDebt {
+	margin-left: 5px;
+}
+
+#btnList {
+	margin-right: 5px;
+}
+
+#btnPay {
+	margin-left: 5px;
+}
+
+#footer {
+	background-color: #eee;
+	height: 60px;
+}
+
+#user {
+	display: inline-block;
+	line-height: 60px;
+	height: 60px;
+	margin-left: 15px;
+	cursor: pointer;
+	text-transform: capitalize;
+	font-variant: small-caps;
+}
+
+#total {
+	display: inline-block;
+	line-height: 60px;
+	height: 60px;
+	float: right;
+	margin-right: 15px;
+}
+
+#list {
+	height: 530px;
+	margin-bottom: 15px;
+	background-color: #eee;
+	overflow-y: auto;
+}
+
+#list .list-item:nth-child(even) {
+	background-color: #e0e0e0;
+}
+
+#list .selected:nth-child(even) {
+    background-color: #9be;
+}
+
+#list .selected {
+    background-color: #9be;
+}
+
+.list-item {
+	height: 20px;
+	padding: 5px;
+	cursor: pointer;
+}
+
+.list-item:hover {	
+    background-color: #9be;
+}
+
+#list .list-item:nth-child(even):hover {
+	background-color: #9be;
+}
+
+.item-amt {
+	display: inline-block;
+	float: left;	
+}
+
+.item-name {
+	display: inline-block;
+	margin-left: 30px;
+}
+
+.item-date {	
+	display: inline-block;
+	float: right;
+	font-size: 8pt;
+}
+
+#actions {
+	height: 50px;
+	margin-bottom: 15px;
+	background-color: #eee;
+}
+
+#btnBack {
+	display: inline-block;
+	width: 60px;
+	height: 50px;
+	border-right: 5px solid #fff;
+	cursor: pointer;
+	text-align: center;
+	font-size: 15pt;
+	font-variant: small-caps;
+	line-height: 55px;
+}
+
+#action {	
+	display: inline-block;
+	width: 330px;
+	text-align: center;
+}
+
+#btnOk {
+	display: inline-block;
+	width: 60px;
+	height: 50px;
+	border-left: 5px solid #fff;
+	cursor: pointer;
+	text-align: center;
+	font-size: 22pt;
+	font-variant: small-caps;
+	line-height: 50px;
+}
+
+#action div {
+	display: inline-block;
+	background-color: #fff;
+	border: 1px solid #000;
+	margin: 1px;
+	padding: 1px;
+}
+
+#action input {
+	border: 0;
+}

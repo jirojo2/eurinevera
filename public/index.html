@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<title>Nevera - EURIELEC</title>
+
+	<link href="style.css" rel="stylesheet" />
+	<link href="wide.css" rel="stylesheet" media="only screen and (min-device-width: 481px)" />
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+
+	<script type="text/javascript">
+
+		var debtTotal = 0;
+		var debtUser  = 0;
+		var     user  = undefined;
+		var     list  = [];
+		var    prices = [];
+
+		$(function(){
+			// Init app
+
+			// Ocultar views no usadas
+			$("#list").hide();
+			$("#actions").hide();
+			$("#pay").hide();
+
+			// Setup events
+			$("#btnList").on('click', function(evt){
+				if (user) loadDebtList();
+				else ; // Request login!
+			});
+
+			$("#logo").on('click', function(evt){
+				// Force update
+				getTotalDebt(updateUI);
+				if (user) getUserDebt(updateUI);
+
+				loadMain();
+			});
+
+			$("#btnBack").on('click', function(evt){
+				loadMain();
+			});
+
+			$("#btnBuy").on('click', function(evt){
+				loadPriceList();
+				$("#btnOk").on('click', function(evt){		
+					// Validate input..
+					if ($("#inName").val() == "" || !isNumber($("#inPrice").val())) return;
+					console.log("Buy: %s for %f€", $("#inName").val(), Number($("#inPrice").val()));
+					// Rever view
+					$("#btnOk").unbind('click'); 
+					$("#action").html("");
+					loadMain();
+				});
+			});
+
+			$("#btnDebt").on('click', function(evt){
+				loadPriceList();
+				$("#btnOk").on('click', function(evt){		
+					// Validate input..
+					if ($("#inName").val() == "" || !isNumber($("#inPrice").val())) return;
+					console.log("Get: %s for %f€", $("#inName").val(), Number($("#inPrice").val()));
+					// Add item
+					addItem({name: $("#inName").val(), amt: Number($("#inPrice").val())}, updateUI);
+					getTotalDebt(updateUI);
+					getUserDebt(updateUI);
+					// Rever view
+					$("#btnOk").unbind('click'); 
+					$("#action").html("");
+					loadMain();
+				});
+			});
+
+			// TestCase
+			user = "test";
+
+			// Update UI
+			getTotalDebt(updateUI);
+			if (user) getUserDebt(updateUI);
+		});
+
+		function getTotalDebt(callback) {
+			$.ajax({url: "/debt", dataType: "json"}).done(function(data){
+				debtTotal = data;
+				if (callback) callback();
+			});
+		}
+
+		function getUserDebt(callback) {
+			$.ajax({url: "/debt/"+user, dataType: "json"}).done(function(data){
+				debtUser = data.debtTotal;
+				list = data.debtItems;
+				if (callback) callback();
+			});
+		}
+
+		function addItem(item, callback) {
+			$.ajax({
+				url: "/add/debt",
+				type: "POST",
+				data: {user: user, name: item.name, amt: item.amt},
+				dataType: "json"
+			}).done(function(msg) {
+				// OK
+				if (callback) callback();
+			});
+		}
+
+		function removeItem(itemid, callback) {
+			$.ajax({
+				url: "/remove/debt/"+itemid,
+				dataType: "json"
+			}).done(function(msg) {
+				// OK
+
+				// Update info!
+				getUserDebt(updateUI);
+				getTotalDebt(updateUI);
+
+				// Remove item from list
+				$("#i"+itemid).remove();
+
+				if (callback) callback();
+			});
+		}
+
+		function getPriceList(callback) {
+			$.ajax({url: "/prices/", dataType: "json"}).done(function(data){
+				prices = data;
+				if (callback) callback();
+			});
+		}
+
+		function updateUI() {
+			if (user) $("#user").html(user);
+			else	  $("#user").html("Login");
+			if (user) $("#total").html(debtUser.toFixed(2) + '€/<b>' + debtTotal.toFixed(2) + '</b>€');
+			else      $("#total").html('La deuda total es de <b>' + debtTotal.toFixed(2) + '</b>€');
+		}
+
+		function clickDebtItem(id) {
+			console.log("Clicked item %d", id);
+			$(".selected").removeClass("selected");
+			$("#i"+id).addClass("selected");
+			$("#action").html("Borrar?");
+			$("#btnOk").show();
+			$("#btnOk").on('click', function(evt){
+				removeItem(id, updateUI);
+				$("#action").html("");
+				$("#btnOk").hide();
+				$("#btnOk").unbind('click'); 
+			});
+		}
+
+		function clickPriceItem(n) {
+			$("#inName").val(prices[n].name);
+			$("#inPrice").val(prices[n].price);
+		}
+
+		function loadMain() {
+
+			// Set view
+			$("#main").show();
+			$("#list").hide();
+			$("#actions").hide();
+			$("#pay").hide();
+		}
+
+		function loadDebtList() {
+			// Fetch server data
+			getUserDebt(function(){
+
+				// Set view
+				$("#main").hide();
+				$("#list").show();
+				$("#actions").show();
+				$("#pay").hide();
+
+				// Actions
+				$("#btnOk").hide();
+
+				// Populate list
+				var html = "";
+				list.forEach(function(i){
+					html += '<div class="list-item" onclick="clickDebtItem('+i.id+')" id="i'+i.id+'">';
+					html += '	<div class="item-amt">'  + i.amt.toFixed(2) + '€</div>';
+					html += '	<div class="item-name">' + i.name           + '</div>';
+					html += '	<div class="item-date">' + fdate(i.date)    + '</div>';
+					html += '</div>';
+				})
+				$("#list").html(html);
+
+			});
+		}
+
+		function loadPriceList() {
+			getPriceList(function(){
+
+				// Set view
+				$("#main").hide();
+				$("#list").show();
+				$("#actions").show();
+				$("#pay").hide();
+
+				// Actions
+				$("#btnOk").show();				
+				$("#action").html('<div><input type="numeric" id="inPrice" />€</div><div><input type="text" id="inName" /></div>');				
+
+				// Populate list
+				var html = "";
+				var n = 0;
+				prices.forEach(function(i){
+					html += '<div class="list-item" onclick="clickPriceItem('+n+')" id="p'+n+'">';
+					html += '	<div class="item-amt">'  + i.price.toFixed(2) + '€</div>';
+					html += '	<div class="item-name">' + i.name             + '</div>';
+					html += '</div>';
+					n++;
+				})
+				$("#list").html(html);
+			});
+		}
+
+		function fdate(date) {
+			var d = new Date(date);
+			var day = d.getDate();    if (day < 10) day = '0'+day;
+			var mon = d.getMonth()+1; if (mon < 10) mon = '0'+mon;
+			var yyy = d.getFullYear();
+
+			return day+"/"+mon+"/"+yyy;
+		}
+
+		function isNumber(n) {
+			return !isNaN(parseFloat(n)) && isFinite(n);
+		}
+
+	</script>	
+</head>
+
+<body>
+
+<div id="wrapper">
+	<div id="logo">
+	</div>
+
+	<div id="content">
+
+		<!-- diferentes vistas -->
+		<div id="main">
+
+			<div id="btnBuy" class="btn">Comprar</div>
+			<div id="btnDebt" class="btn">Endeudar</div>
+			<div id="btnList" class="btn">Ver Deuda</div>
+			<div id="btnPay" class="btn">Pagar</div>
+
+		</div>
+
+		<div id="list">
+		</div>
+
+		<div id="actions">
+			<div id="btnBack">Back</div>
+			<div id="action"></div>
+			<div id="btnOk">Ok</div>
+		</div>
+
+		<div id="pay">
+		</div>
+
+	</div>
+
+	<div id="footer">
+		<div id="user">user</div>
+		<div id="total">xx€/yy€</div>
+	</div>
+</div>
+
+</body>
+</html>
