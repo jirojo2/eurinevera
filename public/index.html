@@ -5,6 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 	<title>Nevera - EURIELEC</title>
 
+	<link rel="icon" type="image/png" href="icon.png" />
 	<link href="style.css" rel="stylesheet" />
 	<link href="wide.css" rel="stylesheet" media="only screen and (min-device-width: 481px)" />
 	<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
@@ -29,7 +30,11 @@
 			// Setup events
 			$("#btnList").on('click', function(evt){
 				if (user) loadDebtList();
-				else ; // Request login!
+				else  {
+					// Display user list
+					loadUserList();
+					updateUI();
+				}
 			});
 
 			$("#logo").on('click', function(evt){
@@ -45,6 +50,14 @@
 			});
 
 			$("#btnBuy").on('click', function(evt){
+
+				if (!user) {
+					// Display user list
+					loadUserList();
+					updateUI();
+					return;
+				}
+
 				loadPriceList();
 				$("#btnOk").unbind('click'); 
 				$("#btnOk").on('click', function(evt){		
@@ -59,6 +72,14 @@
 			});
 
 			$("#btnDebt").on('click', function(evt){
+
+				if (!user) {
+					// Display user list
+					loadUserList();
+					updateUI();
+					return;
+				}
+
 				loadPriceList();
 				$("#btnOk").unbind('click'); 
 				$("#btnOk").on('click', function(evt){		
@@ -77,6 +98,13 @@
 			});
 
 			$("#btnPay").on('click', function(evt){
+
+				if (!user) {
+					// Display user list
+					loadUserList();
+					updateUI();
+					return;
+				}
 
 				// Set view
 				$("#main").hide();
@@ -363,7 +391,7 @@
 		</div>
 
 		<div id="actions">
-			<div id="btnBack">Back</div>
+			<div id="btnBack">&larr;</div>
 			<div id="action"></div>
 			<div id="btnOk">Ok</div>
 		</div>
