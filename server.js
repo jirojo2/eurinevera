@@ -72,12 +72,13 @@ app.get ('/debt', debt.total);
 app.get ('/debt/:id', debt.getUser);
 app.post('/add/debt', debt.addItem);
 app.post('/remove/debt', debt.reset);
-app.get ('/remove/debt/:id', debt.removeItem);
+app.post('/remove/debt/:id', debt.removeItem);
 app.post('/remove/debtamt', debt.removeAmt);
 app.get ('/prices', getPrices);
+app.get ('/users', debt.getUsers);
 
 // TestCase
-debt.initTest();
+//debt.initTest(); // disabled.
 
 // Load price list
 loadPrices();

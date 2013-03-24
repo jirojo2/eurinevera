@@ -16,6 +16,7 @@
 		var     user  = undefined;
 		var     list  = [];
 		var    prices = [];
+		var     users = [];
 
 		$(function(){
 			// Init app
@@ -106,9 +107,14 @@
 				});
 			});
 
+			$("#user").on('click', function(evt){
+				// Logout
+				user = undefined;
 
-			// TestCase
-			user = "test";
+				// Display user list
+				loadUserList();
+				updateUI();
+			});
 
 			// Update UI
 			getTotalDebt(updateUI);
@@ -157,6 +163,8 @@
 		function removeItem(itemid, callback) {
 			$.ajax({
 				url: "/remove/debt/"+itemid,
+				type: "POST",
+				data: {user: user},
 				dataType: "json"
 			}).done(function(msg) {
 				// OK
@@ -175,6 +183,13 @@
 		function getPriceList(callback) {
 			$.ajax({url: "/prices/", dataType: "json"}).done(function(data){
 				prices = data;
+				if (callback) callback();
+			});
+		}
+
+		function getUserList(callback) {			
+			$.ajax({url: "/users/", dataType: "json"}).done(function(data){
+				users = data;
 				if (callback) callback();
 			});
 		}
@@ -204,6 +219,13 @@
 		function clickPriceItem(n) {
 			$("#inName").val(prices[n].name);
 			$("#inPrice").val(prices[n].price);
+		}
+
+		function clickUserItem(n) {
+			// Login
+			user = users[n].name;
+			getUserDebt(updateUI);
+			loadMain();
 		}
 
 		function loadMain() {
@@ -261,6 +283,40 @@
 				prices.forEach(function(i){
 					html += '<div class="list-item" onclick="clickPriceItem('+n+')" id="p'+n+'">';
 					html += '	<div class="item-amt">'  + i.price.toFixed(2) + '€</div>';
+					html += '	<div class="item-name">' + i.name             + '</div>';
+					html += '</div>';
+					n++;
+				})
+				$("#list").html(html);
+			});
+		}
+
+		function loadUserList() {
+			getUserList(function(){
+
+				// Set view
+				$("#main").hide();
+				$("#list").show();
+				$("#actions").show();
+				$("#pay").hide();
+
+				// Actions
+				$("#btnOk").show();				
+				$("#action").html('Nuevo usuario: <div><input type="text" id="inName" /></div>');
+				$("#btnOk").unbind('click');	
+				$("#btnOk").on('click', function(evt){
+					// Login
+					user = $("#inName").val();
+					getUserDebt(updateUI);
+					loadMain();
+				});	
+
+				// Populate list
+				var html = "";
+				var n = 0;
+				users.forEach(function(i){
+					html += '<div class="list-item" onclick="clickUserItem('+n+')" id="u'+n+'">';
+					html += '	<div class="item-amt">'  + i.debt.toFixed(2) + '€</div>';
 					html += '	<div class="item-name">' + i.name             + '</div>';
 					html += '</div>';
 					n++;

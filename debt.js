@@ -53,6 +53,13 @@ exports.getUser = function(req, res) {
 	user.debtTotal = 0;
 	user.debtItems = [];
 
+	// Check if user exists... else create it
+	db.query('SELECT * FROM users WHERE name = ?', [id], function(err, rows, fields) {
+		if (rows.length == 0) {
+			db.query("INSERT INTO users (name, debt) VALUES (?, '0')", [id]);
+		}
+	});
+
 	db.query('SELECT * FROM debt WHERE user = ?', [id], function(err, rows, fields) {
 		if (err) throw err;
 
@@ -75,6 +82,9 @@ exports.addItem = function(req, res) {
 	db.query("INSERT INTO debt (user, amt, name, date) VALUES ('"+user+"', '"+amt+"', '"+name+"', '"+new Date()+"')", function(err, rows, fields) {
 		if (err) throw err;
 
+		// Recalculate debt total for user
+		recalculate(user);
+
 		res.json({});
 	});
 
@@ -85,15 +95,22 @@ exports.reset = function(req, res) {
 	db.query('DELETE FROM debt', function(err, rows, fields) {
 		if (err) throw err;
 
+		// Recalculate debt total for all users (0)
+		db.query("UPDATE user SET debt = '0'");
+
 		res.json({});
 	});
 }
 
 exports.removeItem = function(req, res) {
 	
+	var user = req.body.user;
 	var id = req.params.id;
 	db.query('DELETE FROM debt WHERE id = ?', [id], function(err, rows, fields) {
 		if (err) throw err;
+
+		// Recalculate debt total for user
+		recalculate(user);
 
 		res.json({});
 	});
@@ -122,9 +139,38 @@ exports.removeAmt = function(req, res) {
 				rem -= i.amt;
 			}
 		});
+
+		// Recalculate debt total for user
+		recalculate(user);
 	});
 
 	res.json({});
+}
+
+exports.getUsers = function(req, res) {
+
+	var list = [];
+
+	db.query('SELECT * FROM users ORDER BY debt DESC', function(err, rows, fields) {
+		if (err) throw err;
+
+		rows.forEach(function(i) {
+			list.push({id: i.id, debt: Number(i.debt), name: i.name});
+		});
+
+		res.json(list);
+	});
+}
+
+function recalculate(user) {
+	var total = 0;
+	db.query('SELECT * FROM debt WHERE user = ?', [user], function(err, rows, fields) {
+		rows.forEach(function(i){
+			total += Number(i.amt);
+		});
+
+		db.query('UPDATE users SET debt = ? WHERE name = ?', [total, user]);
+	});
 }
 
 // TEST UNIT
