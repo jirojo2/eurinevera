@@ -101,7 +101,30 @@ exports.removeItem = function(req, res) {
 
 exports.removeAmt = function(req, res) {
 
-	// TODO
+	// remove the little ones first, then modify the next one with the difference
+	var user = req.body.user;
+	var rem = req.body.amt;
+	db.query('SELECT * FROM debt WHERE user = ? ORDER BY amt', [user], function(err, rows, fields) {
+		if (err) throw err;
+
+		rows.forEach(function (i) {
+			if (rem > 0) {
+				if (i.amt > rem)
+				{
+					// edit this entry
+					var date = new Date().getTime();
+					db.query("UPDATE debt SET amt = ? WHERE id = ?", [i.amt-rem, i.id]);
+					rem = 0;
+					return;
+				}
+
+				db.query("DELETE FROM debt WHERE id = ?", [i.id]);
+				rem -= i.amt;
+			}
+		});
+	});
+
+	res.json({});
 }
 
 // TEST UNIT

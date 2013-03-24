@@ -78,7 +78,7 @@ body {
 }
 
 #list {
-	height: 530px;
+	height: 525px;
 	margin-bottom: 15px;
 	background-color: #eee;
 	overflow-y: auto;
@@ -172,4 +172,5 @@ body {
 
 #action input {
 	border: 0;
+	width: 150px;
 }

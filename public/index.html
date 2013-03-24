@@ -45,6 +45,7 @@
 
 			$("#btnBuy").on('click', function(evt){
 				loadPriceList();
+				$("#btnOk").unbind('click'); 
 				$("#btnOk").on('click', function(evt){		
 					// Validate input..
 					if ($("#inName").val() == "" || !isNumber($("#inPrice").val())) return;
@@ -58,6 +59,7 @@
 
 			$("#btnDebt").on('click', function(evt){
 				loadPriceList();
+				$("#btnOk").unbind('click'); 
 				$("#btnOk").on('click', function(evt){		
 					// Validate input..
 					if ($("#inName").val() == "" || !isNumber($("#inPrice").val())) return;
@@ -72,6 +74,38 @@
 					loadMain();
 				});
 			});
+
+			$("#btnPay").on('click', function(evt){
+
+				// Set view
+				$("#main").hide();
+				$("#list").show();
+				$("#actions").show();
+				$("#pay").hide();
+
+				// Actions
+				$("#btnOk").show();				
+				$("#action").html('Pagar <div><input type="number" id="inPrice" />€</div></div>');	
+				$("#list").html("");		
+
+				$("#btnOk").unbind('click'); 
+				$("#btnOk").on('click', function(evt){		
+					// Validate input..
+					if (!isNumber($("#inPrice").val())) return;
+					console.log("Pay %f€", Number($("#inPrice").val()));
+					// Pay
+					removeAmt(Number($("#inPrice").val()), function(){
+						getTotalDebt(updateUI);
+						getUserDebt(updateUI);
+					});
+
+					// Rever view
+					$("#btnOk").unbind('click'); 
+					$("#action").html("");
+					loadMain();
+				});
+			});
+
 
 			// TestCase
 			user = "test";
@@ -101,6 +135,18 @@
 				url: "/add/debt",
 				type: "POST",
 				data: {user: user, name: item.name, amt: item.amt},
+				dataType: "json"
+			}).done(function(msg) {
+				// OK
+				if (callback) callback();
+			});
+		}
+
+		function removeAmt(amt, callback) {
+			$.ajax({
+				url: "/remove/debtamt",
+				type: "POST",
+				data: {user: user, amt: amt},
 				dataType: "json"
 			}).done(function(msg) {
 				// OK
@@ -146,6 +192,7 @@
 			$("#i"+id).addClass("selected");
 			$("#action").html("Borrar?");
 			$("#btnOk").show();
+			$("#btnOk").unbind('click'); 
 			$("#btnOk").on('click', function(evt){
 				removeItem(id, updateUI);
 				$("#action").html("");
@@ -206,7 +253,7 @@
 
 				// Actions
 				$("#btnOk").show();				
-				$("#action").html('<div><input type="numeric" id="inPrice" />€</div><div><input type="text" id="inName" /></div>');				
+				$("#action").html('<div><input type="number" id="inPrice" />€</div><div><input type="text" id="inName" /></div>');				
 
 				// Populate list
 				var html = "";
