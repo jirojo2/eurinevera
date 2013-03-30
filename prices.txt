@@ -1,2 +1,13 @@
-Nestea: 0.7
-Mixto: 1
+Bote 33ml: 0.50
+Nestea: 0.60
+Aquarius: 0.60
+Sandwich: 0.50
+Croaissant: 0.50
+Napolitana: 0.50
+Ensaimada: 0.50
+Zumo: 0.20
+Batido choco y vainilla: 0.20
+Kit-kat: 0.50
+Huesitos: 0.20
+Café 1 cápsula: 0.50
+Café 2 cápsulas: 0.70
