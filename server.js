@@ -3,7 +3,7 @@ var express = require('express');
 var debt    = require('./debt');
  
 var app  = express();
-var port = 3000;
+var port = 3005;
 var prices = [];
  
 app.configure(function () {
@@ -46,7 +46,7 @@ function readLines(file, func, callback) {
 function loadPrices() {
 	prices = [];
 
-	readLines('prices.txt', loadPrice, function(){
+	readLines(__dirname + '/prices.txt', loadPrice, function(){
 		console.log("Loaded %d items.", prices.length);
 	});
 }
