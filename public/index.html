@@ -29,8 +29,10 @@
 
 			// Setup events
 			$("#btnList").on('click', function(evt){
-				if (user) loadDebtList();
-				else  {
+				if (user) {
+					$("#action").hide();
+					loadDebtList();
+				} else {
 					// Display user list
 					loadUserList();
 					updateUI();
